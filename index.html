@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MealTrack Pro - Meal Package Tracker & Analytics</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Lucide Icons as SVG components
+        const Package = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+        );
+
+        const TrendingUp = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+        );
+
+        const Calendar = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const DollarSign = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Clock = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const MapPin = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        );
+
+        const Plus = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+        );
+
+        const X = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        );
+
+        const BarChart3 = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+        );
+
+        function MealPackageTracker() {
+            const [packages, setPackages] = useState([
+                {
+                    id: 1,
+                    name: "Weekly Veggie Box",
+                    provider: "FreshMeals Co",
+                    status: "delivered",
+                    orderDate: "2024-12-15",
+                    deliveryDate: "2024-12-18",
+                    cost: 49.99,
+                    items: 12
+                },
+                {
+                    id: 2,
+                    name: "Protein Power Pack",
+                    provider: "MealPrep Plus",
+                    status: "in-transit",
+                    orderDate: "2024-12-17",
+                    deliveryDate: "2024-12-20",
+                    cost: 79.99,
+                    items: 8
+                },
+                {
+                    id: 3,
+                    name: "Family Dinner Kit",
+                    provider: "FreshMeals Co",
+                    status: "pending",
+                    orderDate: "2024-12-19",
+                    deliveryDate: "2024-12-22",
+                    cost: 99.99,
+                    items: 15
+                }
+            ]);
+
+            const [showAddForm, setShowAddForm] = useState(false);
+            const [activeView, setActiveView] = useState('tracking');
+            const [newPackage, setNewPackage] = useState({
+                name: '',
+                provider: '',
+                status: 'pending',
+                orderDate: '',
+                deliveryDate: '',
+                cost: '',
+                items: ''
+            });
+
+            const addPackage = () => {
+                if (newPackage.name && newPackage.provider) {
+                    setPackages([...packages, {
+                        ...newPackage,
+                        id: packages.length + 1,
+                        cost: parseFloat(newPackage.cost) || 0,
+                        items: parseInt(newPackage.items) || 0
+                    }]);
+                    setNewPackage({
+                        name: '',
+                        provider: '',
+                        status: 'pending',
+                        orderDate: '',
+                        deliveryDate: '',
+                        cost: '',
+                        items: ''
+                    });
+                    setShowAddForm(false);
+                }
+            };
+
+            const deletePackage = (id) => {
+                setPackages(packages.filter(p => p.id !== id));
+            };
+
+            const totalSpent = packages.reduce((sum, pkg) => sum + pkg.cost, 0);
+            const avgCost = packages.length > 0 ? totalSpent / packages.length : 0;
+            const deliveredCount = packages.filter(p => p.status === 'delivered').length;
+            const inTransitCount = packages.filter(p => p.status === 'in-transit').length;
+
+            const statusColors = {
+                'delivered': 'bg-green-100 text-green-800 border-green-300',
+                'in-transit': 'bg-blue-100 text-blue-800 border-blue-300',
+                'pending': 'bg-yellow-100 text-yellow-800 border-yellow-300'
+            };
+
+            const providerStats = packages.reduce((acc, pkg) => {
+                acc[pkg.provider] = (acc[pkg.provider] || 0) + 1;
+                return acc;
+            }, {});
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-6">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <Package className="w-10 h-10 text-orange-600" />
+                                    <h1 className="text-4xl font-bold text-gray-800">MealTrack Pro</h1>
+                                </div>
+                                <button
+                                    onClick={() => setShowAddForm(!showAddForm)}
+                                    className="flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-xl hover:bg-orange-700 transition-colors shadow-md"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                    Add Package
+                                </button>
+                            </div>
+                            
+                            {/* View Toggle */}
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    onClick={() => setActiveView('tracking')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${
+                                        activeView === 'tracking' 
+                                            ? 'bg-orange-600 text-white shadow-md' 
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    <Package className="w-5 h-5" />
+                                    Package Tracking
+                                </button>
+                                <button
+                                    onClick={() => setActiveView('analytics')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${
+                                        activeView === 'analytics' 
+                                            ? 'bg-orange-600 text-white shadow-md' 
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    <BarChart3 className="w-5 h-5" />
+                                    Analytics
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Add Package Form */}
+                        {showAddForm && (
+                            <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Package</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <input
+                                        type="text"
+                                        placeholder="Package Name"
+                                        value={newPackage.name}
+                                        onChange={(e) => setNewPackage({...newPackage, name: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Provider"
+                                        value={newPackage.provider}
+                                        onChange={(e) => setNewPackage({...newPackage, provider: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                    <input
+                                        type="date"
+                                        placeholder="Order Date"
+                                        value={newPackage.orderDate}
+                                        onChange={(e) => setNewPackage({...newPackage, orderDate: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                    <input
+                                        type="date"
+                                        placeholder="Delivery Date"
+                                        value={newPackage.deliveryDate}
+                                        onChange={(e) => setNewPackage({...newPackage, deliveryDate: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Cost ($)"
+                                        value={newPackage.cost}
+                                        onChange={(e) => setNewPackage({...newPackage, cost: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Number of Items"
+                                        value={newPackage.items}
+                                        onChange={(e) => setNewPackage({...newPackage, items: e.target.value})}
+                                        className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none"
+                                    />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={addPackage}
+                                        className="bg-orange-600 text-white px-8 py-3 rounded-xl hover:bg-orange-700 transition-colors font-medium"
+                                    >
+                                        Add Package
+                                    </button>
+                                    <button
+                                        onClick={() => setShowAddForm(false)}
+                                        className="bg-gray-200 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tracking View */}
+                        {activeView === 'tracking' && (
+                            <div className="space-y-4">
+                                {packages.map((pkg) => (
+                                    <div key={pkg.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <h3 className="text-2xl font-bold text-gray-800">{pkg.name}</h3>
+                                                    <span className={`px-4 py-1 rounded-full text-sm font-medium border-2 ${statusColors[pkg.status]}`}>
+                                                        {pkg.status.replace('-', ' ').toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-600 font-medium">{pkg.provider}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => deletePackage(pkg.id)}
+                                                className="text-red-500 hover:text-red-700 transition-colors p-2"
+                                            >
+                                                <X className="w-6 h-6" />
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Calendar className="w-5 h-5 text-orange-600" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Ordered</p>
+                                                    <p className="font-medium">{pkg.orderDate}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Clock className="w-5 h-5 text-orange-600" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Delivery</p>
+                                                    <p className="font-medium">{pkg.deliveryDate}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <DollarSign className="w-5 h-5 text-orange-600" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Cost</p>
+                                                    <p className="font-medium">${pkg.cost.toFixed(2)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Package className="w-5 h-5 text-orange-600" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Items</p>
+                                                    <p className="font-medium">{pkg.items} items</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Analytics View */}
+                        {activeView === 'analytics' && (
+                            <div className="space-y-6">
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <DollarSign className="w-8 h-8 text-green-600" />
+                                            <h3 className="text-gray-600 font-medium">Total Spent</h3>
+                                        </div>
+                                        <p className="text-3xl font-bold text-gray-800">${totalSpent.toFixed(2)}</p>
+                                    </div>
+                                    
+                                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <TrendingUp className="w-8 h-8 text-blue-600" />
+                                            <h3 className="text-gray-600 font-medium">Average Cost</h3>
+                                        </div>
+                                        <p className="text-3xl font-bold text-gray-800">${avgCost.toFixed(2)}</p>
+                                    </div>
+                                    
+                                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Package className="w-8 h-8 text-purple-600" />
+                                            <h3 className="text-gray-600 font-medium">Total Packages</h3>
+                                        </div>
+                                        <p className="text-3xl font-bold text-gray-800">{packages.length}</p>
+                                    </div>
+                                    
+                                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <MapPin className="w-8 h-8 text-orange-600" />
+                                            <h3 className="text-gray-600 font-medium">Delivered</h3>
+                                        </div>
+                                        <p className="text-3xl font-bold text-gray-800">{deliveredCount}</p>
+                                    </div>
+                                </div>
+
+                                {/* Status Breakdown */}
+                                <div className="bg-white rounded-2xl shadow-lg p-8">
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Status Breakdown</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="flex justify-between mb-2">
+                                                <span className="text-gray-700 font-medium">Delivered</span>
+                                                <span className="text-gray-800 font-bold">{deliveredCount} packages</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                                <div 
+                                                    className="bg-green-500 h-3 rounded-full transition-all"
+                                                    style={{width: `${(deliveredCount / packages.length) * 100}%`}}
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div className="flex justify-between mb-2">
+                                                <span className="text-gray-700 font-medium">In Transit</span>
+                                                <span className="text-gray-800 font-bold">{inTransitCount} packages</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                                <div 
+                                                    className="bg-blue-500 h-3 rounded-full transition-all"
+                                                    style={{width: `${(inTransitCount / packages.length) * 100}%`}}
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <div className="flex justify-between mb-2">
+                                                <span className="text-gray-700 font-medium">Pending</span>
+                                                <span className="text-gray-800 font-bold">{packages.length - deliveredCount - inTransitCount} packages</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                                <div 
+                                                    className="bg-yellow-500 h-3 rounded-full transition-all"
+                                                    style={{width: `${((packages.length - deliveredCount - inTransitCount) / packages.length) * 100}%`}}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Provider Stats */}
+                                <div className="bg-white rounded-2xl shadow-lg p-8">
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Provider Statistics</h3>
+                                    <div className="space-y-4">
+                                        {Object.entries(providerStats).map(([provider, count]) => (
+                                            <div key={provider}>
+                                                <div className="flex justify-between mb-2">
+                                                    <span className="text-gray-700 font-medium">{provider}</span>
+                                                    <span className="text-gray-800 font-bold">{count} packages</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                                    <div 
+                                                        className="bg-orange-500 h-3 rounded-full transition-all"
+                                                        style={{width: `${(count / packages.length) * 100}%`}}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<MealPackageTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
